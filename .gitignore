@@ -1,0 +1,10 @@
+/frontend/node_modules/
+/api/apidb.sqlite
+/api/operadb.sqlite
+/crawler/crawler
+/crawler/crawlerDB
+/crawler/CURRENT.bak
+/crawler/LOCK
+/crawler/LOG
+/crawler/MANIFEST-000011
+/.idea/*.*
