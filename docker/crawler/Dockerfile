@@ -1,7 +1,7 @@
-/# Compile crawler 
-FROM golang:1.16-alpine AS go_builder
+# Compile crawler
+FROM golang:1.20-alpine AS go_builder
 RUN apk add gcc musl-dev linux-headers git
-RUN git clone https://github.com/ethereum/node-crawler.git
+RUN git clone https://github.com/unicornultrafoundation/network-stats.git
 WORKDIR /go/node-crawler/crawler
 
 RUN go get github.com/oschwald/geoip2-golang
@@ -11,7 +11,7 @@ RUN go get github.com/protolambda/zrnt/eth2/beacon/common
 RUN go build 
 
 # Copy compiled stuff and run it
-FROM golang:1.16-alpine
+FROM golang:1.20-alpine
 
 COPY --from=go_builder /go/node-crawler/crawler/ /crawler 
 ENTRYPOINT ["/crawler/crawler"]
