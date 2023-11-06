@@ -3,14 +3,10 @@ import Home from "../pages/Home";
 import { Layout } from './Layout';
 
 export function Routing() {
-
-    return (
-    // @ts-ignore
+  return (
     <BrowserRouter>
       <Layout>
-        {/*@ts-ignore*/}
         <Switch>
-          {/*@ts-ignore*/}
           <Route exact path="/">
             <Home />
           </Route>
