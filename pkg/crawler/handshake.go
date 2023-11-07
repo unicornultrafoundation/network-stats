@@ -42,9 +42,11 @@ func getClientInfo(genesis *core.Genesis, networkID uint64, nodeURL string, n *e
 	}
 
 	if err = writeHello(conn, sk); err != nil {
+		log.Error("write handshake failed", "error", err)
 		return nil, err
 	}
 	if err = readHello(conn, &info); err != nil {
+		log.Error("read handshake failed", "error", err)
 		return nil, err
 	}
 
