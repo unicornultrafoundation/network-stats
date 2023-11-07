@@ -362,13 +362,13 @@ func (c Crawler) makeGenesis() *core.Genesis {
 		return core.DefaultGoerliGenesisBlock()
 	}
 
-	return core.DefaultGenesisBlock()
+	return DefaultLocalGenesisBlock()
 }
 
 // DefaultLocalGenesisBlock returns the Ethereum main net genesis block.
 func DefaultLocalGenesisBlock() *core.Genesis {
 	chainConfig := params.ChainConfig{
-		ChainID: big.NewInt(1),
+		ChainID: big.NewInt(39),
 		//HomesteadBlock:                big.NewInt(1_150_000),
 		//DAOForkBlock:                  big.NewInt(1_920_000),
 		//DAOForkSupport:                true,
