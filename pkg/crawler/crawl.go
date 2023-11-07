@@ -315,6 +315,7 @@ func (c Crawler) CrawlRound(
 
 func (c Crawler) discv5(inputSet common.NodeSet) common.NodeSet {
 	ln, config := c.makeDiscoveryConfig()
+	log.Info("disc v5", "config", config, "addr", c.ListenAddr)
 
 	socket := listen(ln, c.ListenAddr)
 
@@ -329,6 +330,8 @@ func (c Crawler) discv5(inputSet common.NodeSet) common.NodeSet {
 
 func (c Crawler) discv4(inputSet common.NodeSet) common.NodeSet {
 	ln, config := c.makeDiscoveryConfig()
+
+	log.Info("disc v4", "config", config, "addr", c.ListenAddr)
 
 	socket := listen(ln, c.ListenAddr)
 
@@ -346,7 +349,7 @@ func (c Crawler) runCrawler(disc resolver, inputSet common.NodeSet) common.NodeS
 	if genesis == nil {
 		genesis = core.DefaultGenesisBlock()
 	}
-
+	log.Info("New crawler with node url", "url", c.NodeURL)
 	crawler := NewCrawler(genesis, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
 	crawler.revalidateInterval = 10 * time.Minute
 	return crawler.Run(c.Timeout)

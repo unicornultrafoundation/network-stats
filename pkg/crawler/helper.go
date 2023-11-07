@@ -7,7 +7,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/p2p/discover"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
 )
 
 func (c Crawler) makeDiscoveryConfig() (*enode.LocalNode, discover.Config) {
@@ -49,7 +48,9 @@ func listen(ln *enode.LocalNode, addr string) *net.UDPConn {
 }
 
 func (c Crawler) parseBootnodes() ([]*enode.Node, error) {
-	bootnodes := params.MainnetBootnodes
+
+	//bootnodes := params.MainnetBootnodes
+	bootnodes := CrawlerMainnetBootnodes
 	if len(c.Bootnodes) != 0 {
 		bootnodes = c.Bootnodes
 	}

@@ -18,6 +18,8 @@ services:
       # Comment out the following two lines to disable the GeoLite DB.
       - --geoipdb
       - /data/GeoLite2-Country.mmdb
+      - --networkid
+      - 39
 
   api:
     build: ./

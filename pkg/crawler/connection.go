@@ -20,6 +20,7 @@ import (
 	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
+	"github.com/ethereum/go-ethereum/log"
 
 	"github.com/ethereum/go-ethereum/eth/protocols/eth"
 	"github.com/ethereum/go-ethereum/p2p"
@@ -264,9 +265,13 @@ func (c *Conn) Write(msg Message) error {
 func (c *Conn) negotiateEthProtocol(caps []p2p.Cap) {
 	var highestEthVersion uint
 	for _, capability := range caps {
-		if capability.Name != "eth" {
-			continue
-		}
+		log.Info("capability", "cap", capability)
+		//if capability.Name != "u2u" {
+		//	continue
+		//}
+		//if capability.Name != "eth" {
+		//	continue
+		//}
 		if capability.Version > highestEthVersion && capability.Version <= c.ourHighestProtoVersion {
 			highestEthVersion = capability.Version
 		}
