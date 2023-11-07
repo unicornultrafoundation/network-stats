@@ -5,7 +5,7 @@ services:
     build: ./
     volumes:
      - ./data:/data
-     - ./GeoLite2-Country.mmdb:/data/GeoLite2-Country.mmdb
+#     - ./data/GeoLite2-Country.mmdb:/data/GeoLite2-Country.mmdb
     command:
       - crawl
       - --timeout
@@ -17,7 +17,7 @@ services:
       # Make sure you have the GeoLite DB in the ./data directory.
       # Comment out the following two lines to disable the GeoLite DB.
       - --geoipdb
-      - GeoLite2-Country.mmdb
+      - /data/GeoLite2-Country.mmdb
 
   api:
     build: ./
