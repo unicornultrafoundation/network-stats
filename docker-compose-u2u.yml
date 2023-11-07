@@ -5,7 +5,7 @@ services:
     build: ./
     volumes:
      - ./data:/data
-     - ./GeoLite2-Country.mmdb:/app/crawler/GeoLite2-Country.mmdb
+     - ./GeoLite2-Country.mmdb:/data/GeoLite2-Country.mmdb
     command:
       - crawl
       - --timeout
