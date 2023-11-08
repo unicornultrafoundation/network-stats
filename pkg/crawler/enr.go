@@ -24,9 +24,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/p2p/enr"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enr"
+	"github.com/unicornultrafoundation/go-u2u/libs/rlp"
 )
 
 // parseNode parses a node record and verifies its signature.

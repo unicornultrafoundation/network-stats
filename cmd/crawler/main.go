@@ -21,7 +21,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/urfave/cli/v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
 var (
@@ -40,9 +40,9 @@ func init() {
 		return Setup(ctx)
 	}
 	// Add subcommands.
-	app.Commands = []*cli.Command{
-		apiCommand,
-		crawlerCommand,
+	app.Commands = []cli.Command{
+		*apiCommand,
+		*crawlerCommand,
 	}
 }
 

@@ -20,12 +20,13 @@ import (
 	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
-	"github.com/ethereum/go-ethereum/log"
 
-	"github.com/ethereum/go-ethereum/eth/protocols/eth"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/rlpx"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/unicornultrafoundation/go-u2u/libs/log"
+
+	"github.com/unicornultrafoundation/go-u2u/libs/eth/protocols/eth"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/rlpx"
+	"github.com/unicornultrafoundation/go-u2u/libs/rlp"
 )
 
 // This file is mostly copy-pasta'd from
@@ -130,18 +131,6 @@ type NewBlock eth.NewBlockPacket
 func (msg NewBlock) Code() int     { return 23 }
 func (msg NewBlock) ReqID() uint64 { return 0 }
 
-// NewPooledTransactionHashes66 is the network packet for the tx hash propagation message.
-type NewPooledTransactionHashes66 eth.NewPooledTransactionHashesPacket66
-
-func (msg NewPooledTransactionHashes66) Code() int     { return 24 }
-func (msg NewPooledTransactionHashes66) ReqID() uint64 { return 0 }
-
-// NewPooledTransactionHashes is the network packet for the tx hash propagation message.
-type NewPooledTransactionHashes eth.NewPooledTransactionHashesPacket68
-
-func (msg NewPooledTransactionHashes) Code() int     { return 24 }
-func (msg NewPooledTransactionHashes) ReqID() uint64 { return 0 }
-
 type GetPooledTransactions eth.GetPooledTransactionsPacket66
 
 func (msg GetPooledTransactions) Code() int     { return 25 }
@@ -217,13 +206,6 @@ func (c *Conn) Read() Message {
 		msg = new(NewBlockHashes)
 	case (Transactions{}).Code():
 		msg = new(Transactions)
-	case (NewPooledTransactionHashes66{}).Code():
-		// Try decoding to eth68
-		ethMsg := new(NewPooledTransactionHashes)
-		if err := rlp.DecodeBytes(rawData, ethMsg); err == nil {
-			return ethMsg
-		}
-		msg = new(NewPooledTransactionHashes66)
 	case (GetPooledTransactions{}.Code()):
 		ethMsg := new(eth.GetPooledTransactionsPacket66)
 		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/gorilla/mux"
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/unicornultrafoundation/go-u2u/libs/log"
 )
 
 type Api struct {

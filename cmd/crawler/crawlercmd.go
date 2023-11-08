@@ -24,15 +24,15 @@ import (
 
 	"github.com/oschwald/geoip2-golang"
 
-	"github.com/ethereum/go-ethereum/cmd/utils"
-	gethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/node-crawler/pkg/common"
 	"github.com/ethereum/node-crawler/pkg/crawler"
 	"github.com/ethereum/node-crawler/pkg/crawlerdb"
+	"github.com/unicornultrafoundation/go-u2u/libs/cmd/utils"
+	gethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
+	"github.com/unicornultrafoundation/go-u2u/libs/log"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
 
-	"github.com/urfave/cli/v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
 var (
@@ -53,9 +53,7 @@ var (
 			nodekeyFlag,
 			timeoutFlag,
 			workersFlag,
-			utils.GoerliFlag,
 			utils.NetworkIdFlag,
-			utils.SepoliaFlag,
 		},
 	}
 )
@@ -117,7 +115,6 @@ func crawlNodes(ctx *cli.Context) error {
 		Bootnodes:  ctx.StringSlice(bootnodesFlag.Name),
 		Timeout:    ctx.Duration(timeoutFlag.Name),
 		Workers:    ctx.Uint64(workersFlag.Name),
-		Sepolia:    ctx.Bool(utils.SepoliaFlag.Name),
 		Goerli:     ctx.Bool(utils.GoerliFlag.Name),
 		NodeDB:     nodeDB,
 	}

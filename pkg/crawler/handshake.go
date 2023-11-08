@@ -8,17 +8,17 @@ import (
 	"net"
 	"time"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/forkid"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/p2p/rlpx"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/node-crawler/pkg/common"
+	ethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
+	"github.com/unicornultrafoundation/go-u2u/libs/core"
+	"github.com/unicornultrafoundation/go-u2u/libs/core/forkid"
+	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
+	"github.com/unicornultrafoundation/go-u2u/libs/ethclient"
+	"github.com/unicornultrafoundation/go-u2u/libs/log"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/rlpx"
+	"github.com/unicornultrafoundation/go-u2u/libs/params"
 
 	"github.com/pkg/errors"
 )
@@ -59,7 +59,7 @@ func getClientInfo(genesis *core.Genesis, networkID uint64, nodeURL string, n *e
 		return nil, errors.Wrap(err, "cannot set conn deadline")
 	}
 
-	s := getStatus(genesis.Config, uint32(conn.negotiatedProtoVersion), genesis.ToBlock().Hash(), networkID, nodeURL)
+	s := getStatus(genesis.Config, uint32(conn.negotiatedProtoVersion), genesis.ToBlock(nil).Hash(), networkID, nodeURL)
 	if err = conn.Write(s); err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func getStatus(config *params.ChainConfig, version uint32, genesis ethCommon.Has
 			TD:              big.NewInt(0),
 			Head:            genesis,
 			Genesis:         genesis,
-			ForkID:          forkid.NewID(config, genesis, 0, 0),
+			ForkID:          forkid.NewID(config, genesis, 0),
 		}
 	}
 
@@ -174,7 +174,7 @@ func getStatus(config *params.ChainConfig, version uint32, genesis ethCommon.Has
 		}
 
 		_status.Head = header.Hash()
-		_status.ForkID = forkid.NewID(config, genesis, header.Number.Uint64(), header.Time)
+		_status.ForkID = forkid.NewID(config, genesis, header.Number.Uint64())
 	}
 
 	return _status

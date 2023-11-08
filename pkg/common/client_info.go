@@ -3,9 +3,9 @@ package common
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/forkid"
-	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/unicornultrafoundation/go-u2u/libs/common"
+	"github.com/unicornultrafoundation/go-u2u/libs/core/forkid"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p"
 )
 
 type ClientInfo struct {

@@ -9,11 +9,11 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/node-crawler/pkg/api"
 	"github.com/ethereum/node-crawler/pkg/apidb"
 	"github.com/ethereum/node-crawler/pkg/crawlerdb"
-	"github.com/urfave/cli/v2"
+	"github.com/unicornultrafoundation/go-u2u/libs/log"
+	"gopkg.in/urfave/cli.v1"
 )
 
 var (

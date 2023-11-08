@@ -3,14 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/urfave/cli/v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
 var (
 	apiDBFlag = &cli.StringFlag{
 		Name:     "api-db",
 		Usage:    "API SQLite file name",
-		Required: true,
+		// Required: true,
 	}
 	apiListenAddrFlag = &cli.StringFlag{
 		Name:  "addr",
@@ -38,7 +38,7 @@ var (
 	crawlerDBFlag = &cli.StringFlag{
 		Name:     "crawler-db",
 		Usage:    "Crawler SQLite file name",
-		Required: true,
+		// Required: true,
 	}
 	dropNodesTimeFlag = &cli.DurationFlag{
 		Name:  "drop-time",

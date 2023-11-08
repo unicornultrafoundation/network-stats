@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/node-crawler/pkg/crawlerdb"
 	"github.com/ethereum/node-crawler/pkg/vparser"
+	"github.com/unicornultrafoundation/go-u2u/libs/log"
 )
 
 func CreateDB(db *sql.DB) error {

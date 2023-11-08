@@ -18,20 +18,21 @@ package crawler
 
 import (
 	"database/sql"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/params"
 	"math/big"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p/discover"
-	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/unicornultrafoundation/go-u2u/libs/common/hexutil"
+	"github.com/unicornultrafoundation/go-u2u/libs/params"
+
 	"github.com/ethereum/node-crawler/pkg/common"
 	"github.com/ethereum/node-crawler/pkg/crawlerdb"
 	"github.com/oschwald/geoip2-golang"
+	"github.com/unicornultrafoundation/go-u2u/libs/core"
+	"github.com/unicornultrafoundation/go-u2u/libs/log"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/discover"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
 )
 
 type Crawler struct {
@@ -358,13 +359,6 @@ func (c Crawler) runCrawler(disc resolver, inputSet common.NodeSet) common.NodeS
 // makeGenesis is the pendant to utils.MakeGenesis
 // with local flags instead of global flags.
 func (c Crawler) makeGenesis() *core.Genesis {
-	if c.Sepolia {
-		return core.DefaultSepoliaGenesisBlock()
-	}
-	if c.Goerli {
-		return core.DefaultGoerliGenesisBlock()
-	}
-
 	return DefaultLocalGenesisBlock()
 }
 
@@ -387,8 +381,8 @@ func DefaultLocalGenesisBlock() *core.Genesis {
 		//LondonBlock:                   big.NewInt(12_965_000),
 		//ArrowGlacierBlock:             big.NewInt(13_773_000),
 		//GrayGlacierBlock:              big.NewInt(15_050_000),
-		TerminalTotalDifficulty:       MainnetTerminalTotalDifficulty, // 58_750_000_000_000_000_000_000
-		TerminalTotalDifficultyPassed: true,
+		// TerminalTotalDifficulty:       MainnetTerminalTotalDifficulty, // 58_750_000_000_000_000_000_000
+		// TerminalTotalDifficultyPassed: true,
 		//ShanghaiTime:                  newUint64(1681338455),
 		//Ethash:                        new(EthashConfig),
 	}

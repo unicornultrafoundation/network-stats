@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/p2p/discover"
-	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/discover"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
 )
 
 func (c Crawler) makeDiscoveryConfig() (*enode.LocalNode, discover.Config) {
