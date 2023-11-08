@@ -111,10 +111,10 @@ func writeHello(conn *Conn, priv *ecdsa.PrivateKey) error {
 	h := &Hello{
 		Version: 5,
 		Caps: []p2p.Cap{
-			{Name: "eth", Version: 66},
-			{Name: "eth", Version: 67},
-			{Name: "eth", Version: 68},
-			{Name: "snap", Version: 1},
+			/* For U2U compabilities, below protocols are applied. More detail at:
+			https://github.com/unicornultrafoundation/go-u2u/blob/d03dea550c200226620424a8a27497eaf9d6021a/gossip/service.go#L398-L403
+			*/
+			{Name: "u2u", Version: 1},
 		},
 		ID: pub0,
 	}
@@ -181,7 +181,8 @@ func getStatus(config *params.ChainConfig, version uint32, genesis ethCommon.Has
 }
 
 func readStatus(conn *Conn, info *common.ClientInfo) error {
-	switch msg := conn.Read().(type) {
+	msg := conn.Read()
+	switch msg := msg.(type) {
 	case *Status:
 		info.ForkID = msg.ForkID
 		info.HeadHash = msg.Head
