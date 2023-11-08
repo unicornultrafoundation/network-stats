@@ -19,7 +19,6 @@ import (
 
 var (
 	_status          *Status
-	lastStatusUpdate time.Time
 )
 
 func getClientInfo(genesisHash ethCommon.Hash, networkID uint64, nodeURL string, n *enode.Node) (*common.ClientInfo, error) {
@@ -155,8 +154,7 @@ func getStatus(version uint32, genesis ethCommon.Hash, network uint64, nodeURL s
 }
 
 func readStatus(conn *Conn, info *common.ClientInfo) error {
-	msg := conn.Read()
-	switch msg := msg.(type) {
+	switch msg := conn.Read().(type) {
 	case *Status:
 		info.NetworkID = msg.NetworkID
 		// m.ProtocolVersion

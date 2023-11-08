@@ -18,7 +18,6 @@ package crawler
 
 import (
 	"database/sql"
-	"math/big"
 	"strings"
 	"sync"
 	"time"
@@ -348,7 +347,3 @@ func (c Crawler) runCrawler(disc resolver, inputSet common.NodeSet) common.NodeS
 	crawler.revalidateInterval = 10 * time.Minute
 	return crawler.Run(c.Timeout)
 }
-
-var MainnetTerminalTotalDifficulty, _ = new(big.Int).SetString("0", 0)
-
-func newUint64(val uint64) *uint64 { return &val }
