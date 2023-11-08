@@ -21,6 +21,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	ethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
 
 	"github.com/unicornultrafoundation/go-u2u/libs/eth/protocols/eth"
@@ -85,8 +86,15 @@ type Pong struct{}
 func (msg Pong) Code() int     { return 0x03 }
 func (msg Pong) ReqID() uint64 { return 0 }
 
+// HandshakeData is the network packet for the initial handshake message
+type HandshakeData struct {
+	ProtocolVersion uint32
+	NetworkID       uint64
+	Genesis         ethCommon.Hash
+}
+
 // Status is the network packet for the status message for eth/64 and later.
-type Status eth.StatusPacket
+type Status HandshakeData
 
 func (msg Status) Code() int     { return 16 }
 func (msg Status) ReqID() uint64 { return 0 }
@@ -237,6 +245,9 @@ func (c *Conn) Write(msg Message) error {
 	payload, err := rlp.EncodeToBytes(msg)
 	if err != nil {
 		return err
+	}
+	if msg.Code() == 16 {
+		println("should pause")
 	}
 	_, err = c.Conn.Write(uint64(msg.Code()), payload)
 	return err

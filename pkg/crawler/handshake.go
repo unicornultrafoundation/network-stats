@@ -1,19 +1,15 @@
 package crawler
 
 import (
-	"context"
 	"crypto/ecdsa"
 	"fmt"
-	"math/big"
 	"net"
 	"time"
 
 	"github.com/ethereum/node-crawler/pkg/common"
 	ethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
 	"github.com/unicornultrafoundation/go-u2u/libs/core"
-	"github.com/unicornultrafoundation/go-u2u/libs/core/forkid"
 	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
-	"github.com/unicornultrafoundation/go-u2u/libs/ethclient"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
@@ -153,28 +149,8 @@ func getStatus(config *params.ChainConfig, version uint32, genesis ethCommon.Has
 		_status = &Status{
 			ProtocolVersion: version,
 			NetworkID:       network,
-			TD:              big.NewInt(0),
-			Head:            genesis,
 			Genesis:         genesis,
-			ForkID:          forkid.NewID(config, genesis, 0),
 		}
-	}
-
-	if nodeURL != "" && time.Since(lastStatusUpdate) > 15*time.Second {
-		cl, err := ethclient.Dial(nodeURL)
-		if err != nil {
-			log.Error("ethclient.Dial", "err", err)
-			return _status
-		}
-
-		header, err := cl.HeaderByNumber(context.Background(), nil)
-		if err != nil {
-			log.Error("cannot get header by number", "err", err)
-			return _status
-		}
-
-		_status.Head = header.Hash()
-		_status.ForkID = forkid.NewID(config, genesis, header.Number.Uint64())
 	}
 
 	return _status
@@ -184,15 +160,8 @@ func readStatus(conn *Conn, info *common.ClientInfo) error {
 	msg := conn.Read()
 	switch msg := msg.(type) {
 	case *Status:
-		info.ForkID = msg.ForkID
-		info.HeadHash = msg.Head
 		info.NetworkID = msg.NetworkID
 		// m.ProtocolVersion
-		info.TotalDifficulty = msg.TD
-		// Set correct TD if received TD is higher
-		if msg.TD.Cmp(_status.TD) > 0 {
-			_status.TD = msg.TD
-		}
 	case *Disconnect:
 		return fmt.Errorf("bad status handshake disconnect: %v", msg.Reason.Error())
 	case *Error:
