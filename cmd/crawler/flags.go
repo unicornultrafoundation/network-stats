@@ -8,8 +8,8 @@ import (
 
 var (
 	apiDBFlag = &cli.StringFlag{
-		Name:     "api-db",
-		Usage:    "API SQLite file name",
+		Name:  "api-db",
+		Usage: "API SQLite file name",
 		// Required: true,
 	}
 	apiListenAddrFlag = &cli.StringFlag{
@@ -36,8 +36,8 @@ var (
 		Value: 3000,
 	}
 	crawlerDBFlag = &cli.StringFlag{
-		Name:     "crawler-db",
-		Usage:    "Crawler SQLite file name",
+		Name:  "crawler-db",
+		Usage: "Crawler SQLite file name",
 		// Required: true,
 	}
 	dropNodesTimeFlag = &cli.DurationFlag{
@@ -80,5 +80,10 @@ var (
 		Name:  "workers",
 		Usage: "Number of workers to start for updating nodes",
 		Value: 16,
+	}
+	genesisHashFlag = &cli.StringFlag{
+		Name:  "genesisHash",
+		Usage: "Genesis hash in hex. (Mainnet: 0x54e033c612a9b1a8ac8c6cb131f513202648f19b3a2756f8e2e40877d280606c)",
+		Value: "0x54e033c612a9b1a8ac8c6cb131f513202648f19b3a2756f8e2e40877d280606c",
 	}
 )

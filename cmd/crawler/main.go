@@ -27,7 +27,7 @@ import (
 var (
 	app = &cli.App{
 		Name:        filepath.Base(os.Args[0]),
-		Usage:       "go-ethereum crawler",
+		Usage:       "go-u2u crawler",
 		Version:     "v.0.0.1",
 		Writer:      os.Stdout,
 		HideVersion: true,

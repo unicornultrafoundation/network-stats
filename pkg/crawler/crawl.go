@@ -23,13 +23,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/unicornultrafoundation/go-u2u/libs/common/hexutil"
-	"github.com/unicornultrafoundation/go-u2u/libs/params"
+	ethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
 
 	"github.com/ethereum/node-crawler/pkg/common"
 	"github.com/ethereum/node-crawler/pkg/crawlerdb"
 	"github.com/oschwald/geoip2-golang"
-	"github.com/unicornultrafoundation/go-u2u/libs/core"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/discover"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
@@ -37,15 +35,14 @@ import (
 
 type Crawler struct {
 	// These are probably from flags
-	NetworkID  uint64
-	NodeURL    string
-	ListenAddr string
-	NodeKey    string
-	Bootnodes  []string
-	Timeout    time.Duration
-	Workers    uint64
-	Sepolia    bool
-	Goerli     bool
+	GenesisHash string
+	NetworkID   uint64
+	NodeURL     string
+	ListenAddr  string
+	NodeKey     string
+	Bootnodes   []string
+	Timeout     time.Duration
+	Workers     uint64
 
 	NodeDB *enode.DB
 }
@@ -53,9 +50,9 @@ type Crawler struct {
 type crawler struct {
 	output common.NodeSet
 
-	genesis   *core.Genesis
-	networkID uint64
-	nodeURL   string
+	genesisHash ethCommon.Hash
+	networkID   uint64
+	nodeURL     string
 
 	disc resolver
 
@@ -81,7 +78,7 @@ type resolver interface {
 }
 
 func NewCrawler(
-	genesis *core.Genesis,
+	genesisHash string,
 	networkID uint64,
 	nodeURL string,
 	input common.NodeSet,
@@ -90,17 +87,17 @@ func NewCrawler(
 	iters ...enode.Iterator,
 ) *crawler {
 	c := &crawler{
-		output:    make(common.NodeSet, len(input)),
-		genesis:   genesis,
-		networkID: networkID,
-		nodeURL:   nodeURL,
-		disc:      disc,
-		iters:     iters,
-		inputIter: enode.IterNodes(input.Nodes()),
-		ch:        make(chan *enode.Node),
-		reqCh:     make(chan *enode.Node, 512), // TODO: define this in config
-		workers:   workers,
-		closed:    make(chan struct{}),
+		genesisHash: ethCommon.HexToHash(genesisHash),
+		output:      make(common.NodeSet, len(input)),
+		networkID:   networkID,
+		nodeURL:     nodeURL,
+		disc:        disc,
+		iters:       iters,
+		inputIter:   enode.IterNodes(input.Nodes()),
+		ch:          make(chan *enode.Node),
+		reqCh:       make(chan *enode.Node, 512), // TODO: define this in config
+		workers:     workers,
+		closed:      make(chan struct{}),
 	}
 	c.iters = append(c.iters, c.inputIter)
 	// Copy input to output initially. Any nodes that fail validation
@@ -187,7 +184,7 @@ func (c *crawler) getClientInfoLoop() {
 		var tooManyPeers bool
 		var scoreInc int
 
-		info, err := getClientInfo(c.genesis, c.networkID, c.nodeURL, n)
+		info, err := getClientInfo(c.genesisHash, c.networkID, c.nodeURL, n)
 		if err != nil {
 			log.Warn("GetClientInfo failed", "error", err, "nodeID", n.ID())
 			if strings.Contains(err.Error(), "too many peers") {
@@ -346,54 +343,10 @@ func (c Crawler) discv4(inputSet common.NodeSet) common.NodeSet {
 }
 
 func (c Crawler) runCrawler(disc resolver, inputSet common.NodeSet) common.NodeSet {
-	genesis := c.makeGenesis()
-	if genesis == nil {
-		genesis = core.DefaultGenesisBlock()
-	}
 	log.Info("New crawler with node url", "url", c.NodeURL)
-	crawler := NewCrawler(genesis, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
+	crawler := NewCrawler(c.GenesisHash, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
 	crawler.revalidateInterval = 10 * time.Minute
 	return crawler.Run(c.Timeout)
-}
-
-// makeGenesis is the pendant to utils.MakeGenesis
-// with local flags instead of global flags.
-func (c Crawler) makeGenesis() *core.Genesis {
-	return DefaultLocalGenesisBlock()
-}
-
-// DefaultLocalGenesisBlock returns the Ethereum main net genesis block.
-func DefaultLocalGenesisBlock() *core.Genesis {
-	chainConfig := params.ChainConfig{
-		ChainID: big.NewInt(39),
-		//HomesteadBlock:                big.NewInt(1_150_000),
-		//DAOForkBlock:                  big.NewInt(1_920_000),
-		//DAOForkSupport:                true,
-		//EIP150Block:                   big.NewInt(2_463_000),
-		//EIP155Block:                   big.NewInt(2_675_000),
-		//EIP158Block:                   big.NewInt(2_675_000),
-		//ByzantiumBlock:                big.NewInt(4_370_000),
-		//ConstantinopleBlock:           big.NewInt(7_280_000),
-		//PetersburgBlock:               big.NewInt(7_280_000),
-		//IstanbulBlock:                 big.NewInt(9_069_000),
-		//MuirGlacierBlock:              big.NewInt(9_200_000),
-		//BerlinBlock:                   big.NewInt(12_244_000),
-		//LondonBlock:                   big.NewInt(12_965_000),
-		//ArrowGlacierBlock:             big.NewInt(13_773_000),
-		//GrayGlacierBlock:              big.NewInt(15_050_000),
-		// TerminalTotalDifficulty:       MainnetTerminalTotalDifficulty, // 58_750_000_000_000_000_000_000
-		// TerminalTotalDifficultyPassed: true,
-		//ShanghaiTime:                  newUint64(1681338455),
-		//Ethash:                        new(EthashConfig),
-	}
-	return &core.Genesis{
-		Config:     &chainConfig,
-		Nonce:      66,
-		ExtraData:  hexutil.MustDecode("0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa"),
-		GasLimit:   5000,
-		Difficulty: big.NewInt(17179869184),
-		//Alloc:      decodePrealloc(mainnetAllocData),
-	}
 }
 
 var MainnetTerminalTotalDifficulty, _ = new(big.Int).SetString("0", 0)

@@ -54,6 +54,7 @@ var (
 			timeoutFlag,
 			workersFlag,
 			utils.NetworkIdFlag,
+			genesisHashFlag,
 		},
 	}
 )
@@ -108,15 +109,15 @@ func crawlNodes(ctx *cli.Context) error {
 	}
 
 	crawler := crawler.Crawler{
-		NetworkID:  ctx.Uint64(utils.NetworkIdFlag.Name),
-		NodeURL:    ctx.String(nodeURLFlag.Name),
-		ListenAddr: ctx.String(listenAddrFlag.Name),
-		NodeKey:    ctx.String(nodekeyFlag.Name),
-		Bootnodes:  ctx.StringSlice(bootnodesFlag.Name),
-		Timeout:    ctx.Duration(timeoutFlag.Name),
-		Workers:    ctx.Uint64(workersFlag.Name),
-		Goerli:     ctx.Bool(utils.GoerliFlag.Name),
-		NodeDB:     nodeDB,
+		GenesisHash: ctx.String(genesisHashFlag.Name),
+		NetworkID:   ctx.Uint64(utils.NetworkIdFlag.Name),
+		NodeURL:     ctx.String(nodeURLFlag.Name),
+		ListenAddr:  ctx.String(listenAddrFlag.Name),
+		NodeKey:     ctx.String(nodekeyFlag.Name),
+		Bootnodes:   ctx.StringSlice(bootnodesFlag.Name),
+		Timeout:     ctx.Duration(timeoutFlag.Name),
+		Workers:     ctx.Uint64(workersFlag.Name),
+		NodeDB:      nodeDB,
 	}
 
 	for {

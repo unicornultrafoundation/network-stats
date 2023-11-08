@@ -8,13 +8,11 @@ import (
 
 	"github.com/ethereum/node-crawler/pkg/common"
 	ethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
-	"github.com/unicornultrafoundation/go-u2u/libs/core"
 	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/rlpx"
-	"github.com/unicornultrafoundation/go-u2u/libs/params"
 
 	"github.com/pkg/errors"
 )
@@ -24,7 +22,7 @@ var (
 	lastStatusUpdate time.Time
 )
 
-func getClientInfo(genesis *core.Genesis, networkID uint64, nodeURL string, n *enode.Node) (*common.ClientInfo, error) {
+func getClientInfo(genesisHash ethCommon.Hash, networkID uint64, nodeURL string, n *enode.Node) (*common.ClientInfo, error) {
 	var info common.ClientInfo
 
 	conn, sk, err := dial(n)
@@ -55,7 +53,7 @@ func getClientInfo(genesis *core.Genesis, networkID uint64, nodeURL string, n *e
 		return nil, errors.Wrap(err, "cannot set conn deadline")
 	}
 
-	s := getStatus(genesis.Config, uint32(conn.negotiatedProtoVersion), genesis.ToBlock(nil).Hash(), networkID, nodeURL)
+	s := getStatus(uint32(conn.negotiatedProtoVersion), genesisHash, networkID, nodeURL)
 	if err = conn.Write(s); err != nil {
 		return nil, err
 	}
@@ -144,7 +142,7 @@ func readHello(conn *Conn, info *common.ClientInfo) error {
 	}
 }
 
-func getStatus(config *params.ChainConfig, version uint32, genesis ethCommon.Hash, network uint64, nodeURL string) *Status {
+func getStatus(version uint32, genesis ethCommon.Hash, network uint64, nodeURL string) *Status {
 	if _status == nil {
 		_status = &Status{
 			ProtocolVersion: version,
