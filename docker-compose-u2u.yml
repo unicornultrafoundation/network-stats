@@ -14,7 +14,7 @@ services:
       - "--nodeURL"
       - "https://rpc-mainnet.uniultra.xyz/"
       - "--networkid"
-      - "39"
+      - "0"
       - "--geoipdb"
       - "./data/GeoLite2-Country.mmdb"
 
@@ -34,4 +34,4 @@ services:
     depends_on:
      - api
     ports:
-     - 80:80
+     - 8080:8080

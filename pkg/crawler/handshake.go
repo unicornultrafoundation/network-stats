@@ -108,6 +108,8 @@ func writeHello(conn *Conn, priv *ecdsa.PrivateKey) error {
 			https://github.com/unicornultrafoundation/go-u2u/blob/d03dea550c200226620424a8a27497eaf9d6021a/gossip/service.go#L398-L403
 			*/
 			{Name: "u2u", Version: 1},
+			/* fsnap should be supported however package we sent from this protocol is not handled in go-u2u correctly */
+			// {Name: "fsnap", Version: 1},
 		},
 		ID: pub0,
 	}
