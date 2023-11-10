@@ -17,6 +17,8 @@ services:
       - "0"
       - "--geoipdb"
       - "/data/GeoLite2-Country.mmdb"
+      - "--genesisHash"
+      - "0xe633041cd774e07fce1910e99d16372af38875b16f8ce4d7131180c414ecd9a1"
 
   api:
     build: ./
