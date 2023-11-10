@@ -344,6 +344,6 @@ func (c Crawler) discv4(inputSet common.NodeSet) common.NodeSet {
 func (c Crawler) runCrawler(disc resolver, inputSet common.NodeSet) common.NodeSet {
 	log.Info("New crawler with node url", "url", c.NodeURL)
 	crawler := NewCrawler(c.GenesisHash, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
-	crawler.revalidateInterval = 10 * time.Minute
+	crawler.revalidateInterval = c.Timeout
 	return crawler.Run(c.Timeout)
 }
