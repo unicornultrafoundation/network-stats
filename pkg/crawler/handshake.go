@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	_status          *Status
+	_status *Status
 )
 
 func getClientInfo(genesisHash ethCommon.Hash, networkID uint64, nodeURL string, n *enode.Node) (*common.ClientInfo, error) {
@@ -26,6 +26,7 @@ func getClientInfo(genesisHash ethCommon.Hash, networkID uint64, nodeURL string,
 
 	conn, sk, err := dial(n)
 	if err != nil {
+		log.Error("dial error", "error", err)
 		return nil, err
 	}
 	defer conn.Close()
@@ -54,6 +55,7 @@ func getClientInfo(genesisHash ethCommon.Hash, networkID uint64, nodeURL string,
 
 	s := getStatus(uint32(conn.negotiatedProtoVersion), genesisHash, networkID, nodeURL)
 	if err = conn.Write(s); err != nil {
+		log.Error("conn write failed", "error", err)
 		return nil, err
 	}
 
@@ -61,6 +63,7 @@ func getClientInfo(genesisHash ethCommon.Hash, networkID uint64, nodeURL string,
 	// might still send us one.
 
 	if err = readStatus(conn, &info); err != nil {
+		log.Error("read status", "error", err)
 		return nil, err
 	}
 
@@ -78,6 +81,7 @@ func dial(n *enode.Node) (*Conn, *ecdsa.PrivateKey, error) {
 	dialer := net.Dialer{Timeout: 10 * time.Second}
 	fd, err := dialer.Dial("tcp", fmt.Sprintf("%v:%d", n.IP(), n.TCP()))
 	if err != nil {
+		log.Error("dialer dial failed", "error", err)
 		return nil, nil, err
 	}
 
@@ -92,6 +96,7 @@ func dial(n *enode.Node) (*Conn, *ecdsa.PrivateKey, error) {
 
 	_, err = conn.Handshake(ourKey)
 	if err != nil {
+		log.Error("handshake failed", "error", err)
 		return nil, nil, err
 	}
 

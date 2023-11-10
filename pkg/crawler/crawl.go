@@ -289,7 +289,7 @@ func (c Crawler) CrawlRound(
 
 	wg.Wait()
 
-	output := make(common.NodeSet, len(v5)+len(v4))
+	output := make(common.NodeSet, len(v4)+len(v5))
 	for _, n := range v5 {
 		output[n.N.ID()] = n
 	}
@@ -345,6 +345,6 @@ func (c Crawler) discv4(inputSet common.NodeSet) common.NodeSet {
 func (c Crawler) runCrawler(disc resolver, inputSet common.NodeSet) common.NodeSet {
 	log.Info("New crawler with node url", "url", c)
 	crawler := NewCrawler(c.GenesisHash, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
-	crawler.revalidateInterval = c.Timeout
+	crawler.revalidateInterval = 1 * time.Minute
 	return crawler.Run(c.Timeout)
 }

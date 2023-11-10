@@ -10,13 +10,15 @@ services:
       - "--timeout"
       - "10m"
       - "--crawler-db"
-      - "./data/crawler.db"
+      - "/data/crawler-prod.db"
       - "--nodeURL"
       - "https://rpc-mainnet.uniultra.xyz/"
+      - "--nodefile"
+      - "/data/nodes.json"
       - "--networkid"
       - "0"
       - "--geoipdb"
-      - "./data/GeoLite2-Country.mmdb"
+      - "/data/GeoLite2-Country.mmdb"
 
   api:
     build: ./
@@ -24,7 +26,7 @@ services:
      - ./data:/data
     depends_on:
      - crawler
-    command: "api --crawler-db /data/crawler.db --api-db /data/api.db"
+    command: "api --crawler-db /data/crawler-prod.db --api-db /data/api-prod.db"
 
   frontend:
     build: ./frontend
