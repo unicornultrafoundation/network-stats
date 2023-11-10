@@ -10,13 +10,13 @@ services:
       - "--timeout"
       - "10m"
       - "--crawler-db"
-      - "./data/crawler.db"
+      - "/data/crawler.db"
       - "--nodeURL"
       - "https://rpc-nebulas-testnet.uniultra.xyz/"
       - "--networkid"
       - "0"
       - "--geoipdb"
-      - "./data/GeoLite2-Country.mmdb"
+      - "/data/GeoLite2-Country.mmdb"
 
   api:
     build: ./
