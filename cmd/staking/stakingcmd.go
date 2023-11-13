@@ -64,9 +64,7 @@ func crawlNetwork(ctx *cli.Context) error {
 	}
 
 	for {
-		updatedSet := crawler.CrawlNetwork()
-		if nodesFile != "" {
-			updatedSet.WriteNodesJSON(nodesFile)
-		}
+		crawler.CrawlNetwork()
+
 	}
 }

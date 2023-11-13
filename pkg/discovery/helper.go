@@ -5,12 +5,12 @@ import (
 	"net"
 
 	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
-	"github.com/unicornultrafoundation/go-u2u/libs/p2p/discover"
+	u2uProtocol "github.com/unicornultrafoundation/go-u2u/libs/p2p/discover"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
 )
 
-func (c Discover) makeDiscoveryConfig() (*enode.LocalNode, discover.Config) {
-	var cfg discover.Config
+func (c Discover) makeDiscoveryConfig() (*enode.LocalNode, u2uProtocol.Config) {
+	var cfg u2uProtocol.Config
 	var err error
 
 	if c.NodeKey != "" {
