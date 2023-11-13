@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <Flex width="100%" justify="center" align="center">
       <HStack>
-        <Link href="https://github.com/ethereum/node-crawler">
+        <Link href="https://github.com/unicornultrafoundation/network-stats">
           <HStack>
             <Icon as={VscGithub} title="View source code on GitHub" />
             <Text>contribute</Text>

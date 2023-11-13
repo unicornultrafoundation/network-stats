@@ -1,11 +1,17 @@
-# Ethereum Node Crawler
+# U2U Network stats 
 
-Crawls the network and visualizes collected data. This repository includes backend, API and frontend for Ethereum network crawler.
+Crawls the network and visualizes collected data. This repository includes backend, API and frontend for U2U network crawler.
 
-[Backend](./crawler) is based on [devp2p](https://github.com/ethereum/go-ethereum/tree/master/cmd/devp2p) tool. It tries to connect to discovered nodes, fetches info about them and creates a database. [API](./api) software reads raw node database, filters it, caches and serves as API. [Frontend](./frontend) is a web application which reads data from the API and visualizes them as a dashboard.
+
+- [Discovery](./discovery) is based on [devp2p](https://github.com/ethereum/go-ethereum/tree/master/cmd/devp2p) tool. It tries to connect to discovered nodes, fetches info about them and creates a database.
+- [Crawler](./crawler) is based on JSONRPC modules, which crawl network backbone data as raw data for futher processing/transform.
+
+ [API](./api) software reads transformed node database, filters it, caches and serves as API. 
+ 
+[Frontend](./frontend) is a web application which reads data from the API and visualizes them as a dashboard.
 
 Features:
-
+- Capture all network data and transform for advanced purpose such as staking stats, monitor.
 - Advanced filtering, allows you to add filters for a customized dashboard
 - Drilldown support, allows you to drill down the data to find interesting trends
 - Network upgrade readiness overview

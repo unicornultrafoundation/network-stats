@@ -8,9 +8,9 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"github.com/ethereum/node-crawler/pkg/common"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enr"
+	"github.com/unicornultrafoundation/network-stats/pkg/common"
 
 	beacon "github.com/protolambda/zrnt/eth2/beacon/common"
 	"github.com/protolambda/ztyp/codec"
