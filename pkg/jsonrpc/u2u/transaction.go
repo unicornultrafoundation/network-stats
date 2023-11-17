@@ -1,4 +1,4 @@
-package eth
+package u2u
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 	eTypes "github.com/unicornultrafoundation/go-u2u/libs/core/types"
 )
 
-func (e *Eth) NewEIP1559Tx(
+func (e *U2U) NewEIP1559Tx(
 	to common.Address,
 	amount *big.Int,
 	gasLimit uint64,
@@ -51,7 +51,7 @@ func (e *Eth) NewEIP1559Tx(
 	return signedTx, nil
 }
 
-func (e *Eth) SendRawEIP1559Transaction(
+func (e *U2U) SendRawEIP1559Transaction(
 	to common.Address,
 	amount *big.Int,
 	nonce uint64,
@@ -86,7 +86,7 @@ func (e *Eth) SendRawEIP1559Transaction(
 	return hash, err
 }
 
-func (e *Eth) SendRawTransaction(
+func (e *U2U) SendRawTransaction(
 	to common.Address,
 	amount *big.Int,
 	nonce uint64,
@@ -112,7 +112,7 @@ func (e *Eth) SendRawTransaction(
 
 }
 
-func (e *Eth) SyncSendRawTransaction(
+func (e *U2U) SyncSendRawTransaction(
 	to common.Address,
 	amount *big.Int,
 	nonce uint64,
@@ -172,7 +172,7 @@ func (e *Eth) SyncSendRawTransaction(
 	}
 }
 
-func (e *Eth) SyncSendEIP1559RawTransaction(
+func (e *U2U) SyncSendEIP1559RawTransaction(
 	to common.Address,
 	amount *big.Int,
 	nonce uint64,

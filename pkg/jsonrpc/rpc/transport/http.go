@@ -5,11 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/unicornultrafoundation/network-stats/pkg/jsonrpc/rpc/codec"
 	"net"
 	"strings"
 	"time"
 
+	"github.com/unicornultrafoundation/network-stats/pkg/jsonrpc/rpc/codec"
 	"github.com/valyala/fasthttp"
 )
 

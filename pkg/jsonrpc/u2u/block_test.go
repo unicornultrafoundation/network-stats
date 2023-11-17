@@ -1,24 +1,25 @@
-package eth
+package u2u
 
 import (
 	"fmt"
-	"github.com/unicornultrafoundation/network-stats/pkg/jsonrpc/rpc"
 	"math/big"
 	"testing"
 	"time"
+
+	"github.com/unicornultrafoundation/network-stats/pkg/jsonrpc/rpc"
 )
 
 func TestGetBlockByNumber(t *testing.T) {
-	c, err := rpc.NewClient("https://rpc.flashbots.net", "http://127.0.0.1:7890")
+	c, err := rpc.NewClient("https://rpc-mainnet.uniultra.xyz/", "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	eth := NewEth(c)
-	blockNumber, err := eth.GetBlockNumber()
+	u2uNode := NewU2U(c)
+	blockNumber, err := u2uNode.GetBlockNumber()
 	if err != nil {
 		t.Fatal(err)
 	}
-	block, err := eth.GetBlocByNumber(big.NewInt(int64(blockNumber)), true)
+	block, err := u2uNode.GetBlocByNumber(big.NewInt(int64(blockNumber)), true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -26,18 +27,18 @@ func TestGetBlockByNumber(t *testing.T) {
 }
 
 func TestPollBlock(t *testing.T) {
-	c, err := rpc.NewClient("https://rpc.flashbots.net", "http://127.0.0.1:7890")
+	c, err := rpc.NewClient("https://rpc-mainnet.uniultra.xyz/", "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	eth := NewEth(c)
+	u2uNode := NewU2U(c)
 	for {
-		blockNumber, err := eth.GetBlockNumber()
+		blockNumber, err := u2uNode.GetBlockNumber()
 		if err != nil {
 			t.Fatal(err)
 		}
 		fmt.Printf("get block %v\n", blockNumber)
-		block, err := eth.GetBlocByNumber(big.NewInt(int64(blockNumber)), true)
+		block, err := u2uNode.GetBlocByNumber(big.NewInt(int64(blockNumber)), true)
 		if err != nil {
 			t.Fatal(err)
 		}

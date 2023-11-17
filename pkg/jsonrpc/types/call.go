@@ -1,9 +1,10 @@
 package types
 
 import (
+	"math/big"
+
 	"github.com/unicornultrafoundation/go-u2u/libs/common"
 	"github.com/unicornultrafoundation/go-u2u/libs/common/hexutil"
-	"math/big"
 )
 
 const MAX_GAS_LIMIT = 30000000

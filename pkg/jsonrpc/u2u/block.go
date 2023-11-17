@@ -1,4 +1,4 @@
-package eth
+package u2u
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	u2u "github.com/unicornultrafoundation/go-u2u/libs"
-
 	"github.com/unicornultrafoundation/go-u2u/libs/common"
 	"github.com/unicornultrafoundation/go-u2u/libs/core/types"
 )
@@ -18,7 +17,7 @@ type rpcBlock struct {
 	UncleHashes  []common.Hash        `json:"uncles"`
 }
 
-func (e *Eth) getBlock(method string, args ...interface{}) (*types.Block, error) {
+func (e *U2U) getBlock(method string, args ...interface{}) (*types.Block, error) {
 	var raw json.RawMessage
 	err := e.c.Call(method, &raw, args...)
 	if err != nil {

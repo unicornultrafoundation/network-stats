@@ -76,7 +76,7 @@ type resolver interface {
 	RandomNodes() enode.Iterator
 }
 
-func NewCrawler(
+func NewDiscover(
 	genesisHash string,
 	networkID uint64,
 	nodeURL string,
@@ -344,7 +344,7 @@ func (c Discover) discv4(inputSet common.NodeSet) common.NodeSet {
 
 func (c Discover) runDiscover(disc resolver, inputSet common.NodeSet) common.NodeSet {
 	log.Info("New discover with node url", "url", c)
-	crawler := NewCrawler(c.GenesisHash, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
+	crawler := NewDiscover(c.GenesisHash, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
 	crawler.revalidateInterval = 1 * time.Minute
 	return crawler.Run(c.Timeout)
 }

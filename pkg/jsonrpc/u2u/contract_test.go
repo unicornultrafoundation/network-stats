@@ -1,4 +1,4 @@
-package eth
+package u2u
 
 import (
 	"fmt"
@@ -54,8 +54,8 @@ func TestContractCall(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	eth := NewEth(c)
-	uniswapV2PairContr, err := eth.NewContract(abi, "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852")
+	u2uNode := NewU2U(c)
+	uniswapV2PairContr, err := u2uNode.NewContract(abi, "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,8 +79,8 @@ func TestCallWithMethodSignature(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	e := NewEth(c)
-	result, err := e.Call(&types.CallMsg{
+	u2uNode := NewU2U(c)
+	result, err := u2uNode.Call(&types.CallMsg{
 		To:   common.HexToAddress("0x250d48C5E78f1E85F7AB07FEC61E93ba703aE668"),
 		Data: methodSignature,
 	}, nil)

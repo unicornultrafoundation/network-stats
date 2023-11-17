@@ -1,8 +1,6 @@
 package types
 
-import (
-	"github.com/ethereum/go-ethereum/common/hexutil"
-)
+import "github.com/unicornultrafoundation/go-u2u/libs/common/hexutil"
 
 type FeeHistory struct {
 	BaseFeePerGas []*hexutil.Big   `json:"baseFeePerGas"`

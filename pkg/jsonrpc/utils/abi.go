@@ -2,11 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"github.com/unicornultrafoundation/go-u2u/libs/accounts/abi"
+	"github.com/unicornultrafoundation/go-u2u/libs/common"
+	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
 	"math/big"
-
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func (u *Utils) EncodeFunctionSignature(funcName string) []byte {

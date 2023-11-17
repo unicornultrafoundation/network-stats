@@ -1,17 +1,15 @@
 package types
 
-import (
-	"github.com/ethereum/go-ethereum/common"
-)
+import "github.com/unicornultrafoundation/go-u2u/libs/common"
 
-// type Fliter struct {
+// type Filter struct {
 // 	Address   common.Address `json:"address,omitempty"`
 // 	FromBlock CallMsgBigInt  `json:"fromBlock,omitempty"`
 // 	ToBlock   CallMsgBigInt  `json:"toBlock,omitempty"`
 // 	Topics    []string       `json:"topics,omitempty"`
 // }
 
-type Fliter struct {
+type Filter struct {
 	Address   common.Address `json:"address,omitempty"`
 	FromBlock string         `json:"fromBlock,omitempty"`
 	ToBlock   string         `json:"toBlock,omitempty"`

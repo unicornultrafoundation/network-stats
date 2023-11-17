@@ -3,11 +3,10 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"github.com/unicornultrafoundation/go-u2u/libs/common"
+	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
 	"math/big"
 	"testing"
-
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func TestToWei(t *testing.T) {

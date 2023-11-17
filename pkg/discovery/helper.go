@@ -48,8 +48,6 @@ func listen(ln *enode.LocalNode, addr string) *net.UDPConn {
 }
 
 func (c Discover) parseBootnodes() ([]*enode.Node, error) {
-
-	//bootnodes := params.MainnetBootnodes
 	bootnodes := CrawlerMainnetBootnodes
 	if len(c.Bootnodes) != 0 {
 		bootnodes = c.Bootnodes

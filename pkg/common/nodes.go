@@ -60,8 +60,8 @@ func LoadNodesJSON(file string) NodeSet {
 	return nodes
 }
 
-func (nodes NodeSet) WriteNodesJSON(file string) {
-	nodesJSON, err := json.MarshalIndent(nodes, "", jsonIndent)
+func (ns NodeSet) WriteNodesJSON(file string) {
+	nodesJSON, err := json.MarshalIndent(ns, "", jsonIndent)
 	if err != nil {
 		panic(err)
 	}

@@ -1,4 +1,4 @@
-package eth
+package u2u
 
 import "math/big"
 

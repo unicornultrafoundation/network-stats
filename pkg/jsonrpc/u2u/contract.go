@@ -1,4 +1,4 @@
-package eth
+package u2u
 
 import (
 	"bytes"
@@ -183,7 +183,7 @@ func NewContract(abiString string, contractAddr ...string) (*Contract, error) {
 	return c, nil
 }
 
-func (e *Eth) NewContract(abiString string, contractAddr ...string) (*Contract, error) {
+func (e *U2U) NewContract(abiString string, contractAddr ...string) (*Contract, error) {
 	c, err := NewContract(abiString, contractAddr...)
 	if err != nil {
 		return nil, err
