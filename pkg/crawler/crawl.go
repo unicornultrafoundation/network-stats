@@ -275,12 +275,12 @@ func (c Crawler) CrawlRound(
 	var v4, v5 common.NodeSet
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		v5 = c.discv5(inputSet)
-		log.Info("DiscV5", "nodes", len(v5.Nodes()))
-	}()
+	//wg.Add(1)
+	//go func() {
+	//	defer wg.Done()
+	//	v5 = c.discv5(inputSet)
+	//	log.Info("DiscV5", "nodes", len(v5.Nodes()))
+	//}()
 
 	wg.Add(1)
 	go func() {
