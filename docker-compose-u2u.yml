@@ -20,7 +20,7 @@ services:
       - "--geoipdb"
       - "/data/GeoLite2-Country.mmdb"
       - "--addr"
-      - "0.0.0.0:5050"
+      - ":43794"
       - "--genesisHash"
       - "0x54e033c612a9b1a8ac8c6cb131f513202648f19b3a2756f8e2e40877d280606c"
 
