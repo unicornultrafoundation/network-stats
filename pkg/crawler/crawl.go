@@ -165,6 +165,7 @@ loop:
 func (c *crawler) runIterator(done chan<- enode.Iterator, it enode.Iterator) {
 	defer func() { done <- it }()
 	for it.Next() {
+		log.Info("Try with node", "n", it.Node())
 		select {
 		case c.ch <- it.Node():
 		case <-c.closed:
@@ -174,6 +175,7 @@ func (c *crawler) runIterator(done chan<- enode.Iterator, it enode.Iterator) {
 }
 
 func (c *crawler) getClientInfoLoop() {
+	log.Info("Get client info loop")
 	defer func() { c.Done() }()
 	for n := range c.reqCh {
 		if n == nil {
@@ -237,7 +239,7 @@ func (c *crawler) updateNode(n *enode.Node) {
 	// Request the node record.
 	nn, err := c.disc.RequestENR(n)
 	if err != nil {
-		log.Info("request enr error", "err", err.Error(), "node", node)
+		log.Error("request ENR error", "err", err)
 		if node.Score == 0 {
 			// Node doesn't implement EIP-868.
 			log.Debug("Skipping node", "id", n.ID())
@@ -343,7 +345,8 @@ func (c Crawler) discv4(inputSet common.NodeSet) common.NodeSet {
 }
 
 func (c Crawler) runCrawler(disc resolver, inputSet common.NodeSet) common.NodeSet {
-	log.Info("New crawler with node url", "url", c)
+	log.Info("New crawler info", "crawler", c)
+	log.Info("Discovery config", "disc", disc)
 	crawler := NewCrawler(c.GenesisHash, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
 	crawler.revalidateInterval = 1 * time.Minute
 	return crawler.Run(c.Timeout)
