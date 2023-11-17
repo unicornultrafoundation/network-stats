@@ -52,7 +52,7 @@ var (
 	listenAddrFlag = &cli.StringFlag{
 		Name:  "addr",
 		Usage: "Listening address",
-		Value: "0.0.0.0:0",
+		Value: ":5051",
 	}
 	nodedbFlag = &cli.StringFlag{
 		Name:  "nodedb",
@@ -79,7 +79,7 @@ var (
 	workersFlag = &cli.Uint64Flag{
 		Name:  "workers",
 		Usage: "Number of workers to start for updating nodes",
-		Value: 16,
+		Value: 2,
 	}
 	genesisHashFlag = &cli.StringFlag{
 		Name:  "genesisHash",

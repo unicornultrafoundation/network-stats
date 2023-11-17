@@ -239,7 +239,7 @@ func (c *crawler) updateNode(n *enode.Node) {
 	// Request the node record.
 	nn, err := c.disc.RequestENR(n)
 	if err != nil {
-		log.Error("request ENR error", "err", err)
+		log.Error("request ENR error", "err", err, "node", n)
 		if node.Score == 0 {
 			// Node doesn't implement EIP-868.
 			log.Debug("Skipping node", "id", n.ID())

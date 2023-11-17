@@ -5,6 +5,8 @@ services:
     build: ./
     volumes:
      - ./data:/data
+    ports:
+      - 5051:5051
     command:
       - "crawl"
       - "--timeout"
