@@ -17,22 +17,8 @@
 package main
 
 import (
-	"database/sql"
-	"os"
-
+	"github.com/urfave/cli/v2"
 	_ "modernc.org/sqlite"
-
-	"github.com/oschwald/geoip2-golang"
-
-	"github.com/ethereum/node-crawler/pkg/common"
-	"github.com/ethereum/node-crawler/pkg/crawler"
-	"github.com/ethereum/node-crawler/pkg/crawlerdb"
-	"github.com/unicornultrafoundation/go-u2u/libs/cmd/utils"
-	gethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
-	"github.com/unicornultrafoundation/go-u2u/libs/log"
-	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
-
-	"gopkg.in/urfave/cli.v1"
 )
 
 var (
@@ -53,77 +39,78 @@ var (
 			nodekeyFlag,
 			timeoutFlag,
 			workersFlag,
-			utils.NetworkIdFlag,
+			//utils.NetworkIdFlag,
 			genesisHashFlag,
 		},
 	}
 )
 
 func crawlNodes(ctx *cli.Context) error {
-	var inputSet common.NodeSet
-	var geoipDB *geoip2.Reader
-
-	nodesFile := ctx.String(nodeFileFlag.Name)
-
-	if nodesFile != "" && gethCommon.FileExist(nodesFile) {
-		inputSet = common.LoadNodesJSON(nodesFile)
-	}
-
-	var db *sql.DB
-	if ctx.IsSet(crawlerDBFlag.Name) {
-		name := ctx.String(crawlerDBFlag.Name)
-		shouldInit := false
-		if _, err := os.Stat(name); os.IsNotExist(err) {
-			shouldInit = true
-		}
-
-		var err error
-		db, err = openSQLiteDB(
-			name,
-			ctx.String(autovacuumFlag.Name),
-			ctx.Uint64(busyTimeoutFlag.Name),
-		)
-		if err != nil {
-			panic(err)
-		}
-		log.Info("Connected to db")
-		if shouldInit {
-			log.Info("DB did not exist, init")
-			if err := crawlerdb.CreateDB(db); err != nil {
-				panic(err)
-			}
-		}
-	}
-
-	nodeDB, err := enode.OpenDB(ctx.String(nodedbFlag.Name))
-	if err != nil {
-		panic(err)
-	}
-
-	if geoipFile := ctx.String(geoipdbFlag.Name); geoipFile != "" {
-		geoipDB, err = geoip2.Open(geoipFile)
-		if err != nil {
-			return err
-		}
-		defer func() { _ = geoipDB.Close() }()
-	}
-
-	crawler := crawler.Crawler{
-		GenesisHash: ctx.String(genesisHashFlag.Name),
-		NetworkID:   ctx.Uint64(utils.NetworkIdFlag.Name),
-		NodeURL:     ctx.String(nodeURLFlag.Name),
-		ListenAddr:  ctx.String(listenAddrFlag.Name),
-		NodeKey:     ctx.String(nodekeyFlag.Name),
-		Bootnodes:   ctx.StringSlice(bootnodesFlag.Name),
-		Timeout:     ctx.Duration(timeoutFlag.Name),
-		Workers:     ctx.Uint64(workersFlag.Name),
-		NodeDB:      nodeDB,
-	}
-
-	for {
-		updatedSet := crawler.CrawlRound(inputSet, db, geoipDB)
-		if nodesFile != "" {
-			updatedSet.WriteNodesJSON(nodesFile)
-		}
-	}
+	//var inputSet common.NodeSet
+	//var geoipDB *geoip2.Reader
+	//
+	//nodesFile := ctx.String(nodeFileFlag.Name)
+	//
+	//if nodesFile != "" && gethCommon.FileExist(nodesFile) {
+	//	inputSet = common.LoadNodesJSON(nodesFile)
+	//}
+	//
+	//var db *sql.DB
+	//if ctx.IsSet(crawlerDBFlag.Name) {
+	//	name := ctx.String(crawlerDBFlag.Name)
+	//	shouldInit := false
+	//	if _, err := os.Stat(name); os.IsNotExist(err) {
+	//		shouldInit = true
+	//	}
+	//
+	//	var err error
+	//	db, err = openSQLiteDB(
+	//		name,
+	//		ctx.String(autovacuumFlag.Name),
+	//		ctx.Uint64(busyTimeoutFlag.Name),
+	//	)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	log.Info("Connected to db")
+	//	if shouldInit {
+	//		log.Info("DB did not exist, init")
+	//		if err := crawlerdb.CreateDB(db); err != nil {
+	//			panic(err)
+	//		}
+	//	}
+	//}
+	//
+	//nodeDB, err := enode.OpenDB(ctx.String(nodedbFlag.Name))
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//if geoipFile := ctx.String(geoipdbFlag.Name); geoipFile != "" {
+	//	geoipDB, err = geoip2.Open(geoipFile)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	defer func() { _ = geoipDB.Close() }()
+	//}
+	//
+	//crawler := crawler.Crawler{
+	//	//GenesisHash: ctx.String(genesisHashFlag.Name),
+	//	//NetworkID:   ctx.Uint64(utils.NetworkIdFlag.Name),
+	//	//NodeURL:     ctx.String(nodeURLFlag.Name),
+	//	//ListenAddr: ctx.String(listenAddrFlag.Name),
+	//	//NodeKey:    ctx.String(nodekeyFlag.Name),
+	//	//Bootnodes:  ctx.StringSlice(bootnodesFlag.Name),
+	//	//Timeout:    ctx.Duration(timeoutFlag.Name),
+	//	//Workers:    ctx.Uint64(workersFlag.Name),
+	//	//NodeDB:     nodeDB,
+	//}
+	//
+	//for {
+	//	updatedSet := crawler.CrawlRound(inputSet, db, geoipDB)
+	//	if nodesFile != "" {
+	//		updatedSet.WriteNodesJSON(nodesFile)
+	//	}
+	//}
+	return nil
 }

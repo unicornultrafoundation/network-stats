@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
+	"github.com/unicornultrafoundation/network-stats/pkg/common"
 	"time"
 
 	_ "modernc.org/sqlite"
 
-	"github.com/ethereum/node-crawler/pkg/common"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enr"
 

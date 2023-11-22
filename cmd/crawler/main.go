@@ -18,10 +18,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
 	"os"
 	"path/filepath"
 
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 var (
@@ -40,9 +41,11 @@ func init() {
 		return Setup(ctx)
 	}
 	// Add subcommands.
-	app.Commands = []cli.Command{
-		*apiCommand,
-		*crawlerCommand,
+	app.Commands = []*cli.Command{
+		apiCommand,
+		crawlerCommand,
+		discv4Command,
+		discv5Command,
 	}
 }
 
@@ -52,4 +55,39 @@ func main() {
 		fmt.Println(err)
 		os.Exit(-127)
 	}
+}
+
+// commandHasFlag returns true if the current command supports the given flag.
+func commandHasFlag(ctx *cli.Context, flag cli.Flag) bool {
+	names := flag.Names()
+	set := make(map[string]struct{}, len(names))
+	for _, name := range names {
+		set[name] = struct{}{}
+	}
+	for _, fn := range ctx.FlagNames() {
+		if _, ok := set[fn]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+// getNodeArg handles the common case of a single node descriptor argument.
+func getNodeArg(ctx *cli.Context) *enode.Node {
+	if ctx.NArg() < 1 {
+		exit("missing node as command-line argument")
+	}
+	n, err := parseNode(ctx.Args().First())
+	if err != nil {
+		exit(err)
+	}
+	return n
+}
+
+func exit(err interface{}) {
+	if err == nil {
+		os.Exit(0)
+	}
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
 }

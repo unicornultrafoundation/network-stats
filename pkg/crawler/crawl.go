@@ -17,86 +17,64 @@
 package crawler
 
 import (
-	"database/sql"
-	"strings"
+	"errors"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	ethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
-
-	"github.com/ethereum/node-crawler/pkg/common"
-	"github.com/ethereum/node-crawler/pkg/crawlerdb"
-	"github.com/oschwald/geoip2-golang"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
-	"github.com/unicornultrafoundation/go-u2u/libs/p2p/discover"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
 )
 
 type Crawler struct {
-	// These are probably from flags
-	GenesisHash string
-	NetworkID   uint64
-	NodeURL     string
-	ListenAddr  string
-	NodeKey     string
-	Bootnodes   []string
-	Timeout     time.Duration
-	Workers     uint64
-
-	NodeDB *enode.DB
-}
-
-type crawler struct {
-	output common.NodeSet
-
-	genesisHash ethCommon.Hash
-	networkID   uint64
-	nodeURL     string
-
-	disc resolver
-
-	inputIter enode.Iterator
+	input     NodeSet
+	output    NodeSet
+	disc      resolver
+	NodeKey   string
+	NodeDB    *enode.DB
+	Bootnodes []string
 	iters     []enode.Iterator
-
-	ch     chan *enode.Node
-	closed chan struct{}
+	inputIter enode.Iterator
+	ch        chan *enode.Node
+	closed    chan struct{}
 
 	// settings
 	revalidateInterval time.Duration
-
-	reqCh   chan *enode.Node
-	workers uint64
-
-	sync.WaitGroup
-	sync.RWMutex
+	mu                 sync.RWMutex
 }
+
+func (c *Crawler) SetRevalidateInterval(t time.Duration) {
+	c.revalidateInterval = t
+}
+
+const (
+	nodeRemoved = iota
+	nodeSkipRecent
+	nodeSkipIncompat
+	nodeAdded
+	nodeUpdated
+)
 
 type resolver interface {
 	RequestENR(*enode.Node) (*enode.Node, error)
-	RandomNodes() enode.Iterator
 }
 
-func NewCrawler(
-	genesisHash string,
-	networkID uint64,
-	nodeURL string,
-	input common.NodeSet,
-	workers uint64,
-	disc resolver,
-	iters ...enode.Iterator,
-) *crawler {
-	c := &crawler{
-		genesisHash: ethCommon.HexToHash(genesisHash),
-		output:      make(common.NodeSet, len(input)),
-		networkID:   networkID,
-		nodeURL:     nodeURL,
-		disc:        disc,
-		iters:       iters,
-		inputIter:   enode.IterNodes(input.Nodes()),
-		ch:          make(chan *enode.Node),
-		reqCh:       make(chan *enode.Node, 512), // TODO: define this in config
-		workers:     workers,
-		closed:      make(chan struct{}),
+func NewCrawler(input NodeSet, bootnodes []*enode.Node, disc resolver, iters ...enode.Iterator) (*Crawler, error) {
+	if len(input) == 0 {
+		input.add(bootnodes...)
+	}
+	if len(input) == 0 {
+		return nil, errors.New("no input nodes to start crawling")
+	}
+
+	c := &Crawler{
+		input:     input,
+		output:    make(NodeSet, len(input)),
+		disc:      disc,
+		iters:     iters,
+		inputIter: enode.IterNodes(input.nodes()),
+		ch:        make(chan *enode.Node),
+		closed:    make(chan struct{}),
 	}
 	c.iters = append(c.iters, c.inputIter)
 	// Copy input to output initially. Any nodes that fail validation
@@ -104,68 +82,99 @@ func NewCrawler(
 	for id, n := range input {
 		c.output[id] = n
 	}
-	return c
+	return c, nil
 }
 
-func (c *crawler) Run(timeout time.Duration) common.NodeSet {
+func (c *Crawler) Run(timeout time.Duration, nthreads int) NodeSet {
 	var (
 		timeoutTimer = time.NewTimer(timeout)
 		timeoutCh    <-chan time.Time
+		statusTicker = time.NewTicker(time.Second * 8)
 		doneCh       = make(chan enode.Iterator, len(c.iters))
 		liveIters    = len(c.iters)
-		inputSetLen  = len(c.output)
 	)
+	if nthreads < 1 {
+		nthreads = 1
+	}
 	defer timeoutTimer.Stop()
-
+	defer statusTicker.Stop()
 	for _, it := range c.iters {
 		go c.runIterator(doneCh, it)
 	}
-
-	for i := c.workers; i > 0; i-- {
-		c.Add(1)
-		go c.getClientInfoLoop()
+	var (
+		added   atomic.Uint64
+		updated atomic.Uint64
+		skipped atomic.Uint64
+		recent  atomic.Uint64
+		removed atomic.Uint64
+		wg      sync.WaitGroup
+	)
+	wg.Add(nthreads)
+	for i := 0; i < nthreads; i++ {
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case n := <-c.ch:
+					switch c.updateNode(n) {
+					case nodeSkipIncompat:
+						skipped.Add(1)
+					case nodeSkipRecent:
+						recent.Add(1)
+					case nodeRemoved:
+						removed.Add(1)
+					case nodeAdded:
+						added.Add(1)
+					default:
+						updated.Add(1)
+					}
+				case <-c.closed:
+					return
+				}
+			}
+		}()
 	}
 
 loop:
 	for {
 		select {
-		case n := <-c.ch:
-			c.updateNode(n)
 		case it := <-doneCh:
 			if it == c.inputIter {
 				// Enable timeout when we're done revalidating the input nodes.
-				log.Info("Revalidation of input set is done", "len", inputSetLen)
+				log.Info("Revalidation of input set is done", "len", len(c.input))
 				if timeout > 0 {
 					timeoutCh = timeoutTimer.C
 				}
 			}
-			if liveIters--; liveIters <= 0 {
+			if liveIters--; liveIters == 0 {
 				break loop
 			}
 		case <-timeoutCh:
 			break loop
+		case <-statusTicker.C:
+			log.Info("Crawling in progress",
+				"added", added.Load(),
+				"updated", updated.Load(),
+				"removed", removed.Load(),
+				"ignored(recent)", recent.Load(),
+				"ignored(incompatible)", skipped.Load())
 		}
 	}
 
 	close(c.closed)
-	close(c.reqCh)
 	for _, it := range c.iters {
 		it.Close()
 	}
 	for ; liveIters > 0; liveIters-- {
 		<-doneCh
 	}
-	c.Wait()
-
-	close(c.ch)
-
+	wg.Wait()
 	return c.output
 }
 
-func (c *crawler) runIterator(done chan<- enode.Iterator, it enode.Iterator) {
+func (c *Crawler) runIterator(done chan<- enode.Iterator, it enode.Iterator) {
 	defer func() { done <- it }()
 	for it.Next() {
-		log.Info("Try with node", "n", it.Node())
 		select {
 		case c.ch <- it.Node():
 		case <-c.closed:
@@ -174,76 +183,27 @@ func (c *crawler) runIterator(done chan<- enode.Iterator, it enode.Iterator) {
 	}
 }
 
-func (c *crawler) getClientInfoLoop() {
-	log.Info("Get client info loop")
-	defer func() { c.Done() }()
-	for n := range c.reqCh {
-		if n == nil {
-			return
-		}
-
-		var tooManyPeers bool
-		var scoreInc int
-
-		info, err := getClientInfo(c.genesisHash, c.networkID, c.nodeURL, n)
-		if err != nil {
-			log.Warn("GetClientInfo failed", "error", err, "nodeID", n.ID())
-			if strings.Contains(err.Error(), "too many peers") {
-				tooManyPeers = true
-			}
-		} else {
-			scoreInc = 10
-		}
-
-		if info != nil {
-			log.Info(
-				"Updating node info",
-				"client_type", info.ClientType,
-				"version", info.SoftwareVersion,
-				"network_id", info.NetworkID,
-				"caps", info.Capabilities,
-				"fork_id", info.ForkID,
-				"height", info.Blockheight,
-				"td", info.TotalDifficulty,
-				"head", info.HeadHash,
-			)
-		}
-
-		c.Lock()
-		node := c.output[n.ID()]
-		node.N = n
-		node.Seq = n.Seq()
-		if info != nil {
-			node.Info = info
-		}
-		node.TooManyPeers = tooManyPeers
-		node.Score += scoreInc
-		c.output[n.ID()] = node
-		c.Unlock()
-	}
-}
-
-func (c *crawler) updateNode(n *enode.Node) {
-	c.Lock()
-	defer c.Unlock()
-
+// updateNode updates the info about the given node, and returns a status
+// about what changed
+func (c *Crawler) updateNode(n *enode.Node) int {
+	c.mu.RLock()
 	node, ok := c.output[n.ID()]
+	c.mu.RUnlock()
 
 	// Skip validation of recently-seen nodes.
-	if ok && !node.TooManyPeers && time.Since(node.LastCheck) < c.revalidateInterval {
-		return
+	if ok && time.Since(node.LastCheck) < c.revalidateInterval {
+		return nodeSkipRecent
 	}
 
-	node.LastCheck = time.Now().UTC().Truncate(time.Second)
-
 	// Request the node record.
-	nn, err := c.disc.RequestENR(n)
-	if err != nil {
-		log.Error("request ENR error", "err", err, "node", n)
+	status := nodeUpdated
+	node.LastCheck = truncNow()
+	if nn, err := c.disc.RequestENR(n); err != nil {
+		log.Info("request enr failed", "err", err)
 		if node.Score == 0 {
 			// Node doesn't implement EIP-868.
-			log.Debug("Skipping node", "id", n.ID())
-			return
+			log.Info("Skipping node", "id", n.ID())
+			return nodeSkipIncompat
 		}
 		node.Score /= 2
 	} else {
@@ -252,102 +212,23 @@ func (c *crawler) updateNode(n *enode.Node) {
 		node.Score++
 		if node.FirstResponse.IsZero() {
 			node.FirstResponse = node.LastCheck
+			status = nodeAdded
 		}
 		node.LastResponse = node.LastCheck
 	}
-
 	// Store/update node in output set.
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if node.Score <= 0 {
-		log.Info("Removing node", "id", n.ID())
+		log.Debug("Removing node", "id", n.ID())
 		delete(c.output, n.ID())
-	} else {
-		log.Info("Updating node", "id", n.ID(), "seq", n.Seq(), "score", node.Score)
-		c.reqCh <- n
-		c.output[n.ID()] = node
+		return nodeRemoved
 	}
+	log.Debug("Updating node", "id", n.ID(), "seq", n.Seq(), "score", node.Score)
+	c.output[n.ID()] = node
+	return status
 }
 
-func (c Crawler) CrawlRound(
-	inputSet common.NodeSet,
-	db *sql.DB,
-	geoipDB *geoip2.Reader,
-) common.NodeSet {
-	var v4, v5 common.NodeSet
-	var wg sync.WaitGroup
-
-	//wg.Add(1)
-	//go func() {
-	//	defer wg.Done()
-	//	v5 = c.discv5(inputSet)
-	//	log.Info("DiscV5", "nodes", len(v5.Nodes()))
-	//}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		v4 = c.discv4(inputSet)
-		log.Info("DiscV4", "nodes", len(v4.Nodes()))
-	}()
-
-	wg.Wait()
-
-	output := make(common.NodeSet, len(v4)+len(v5))
-	for _, n := range v5 {
-		output[n.N.ID()] = n
-	}
-	for _, n := range v4 {
-		output[n.N.ID()] = n
-	}
-
-	var nodes []common.NodeJSON
-	for _, node := range output {
-		nodes = append(nodes, node)
-	}
-
-	// Write the node info to influx
-	if db != nil {
-		if err := crawlerdb.UpdateNodes(db, geoipDB, nodes); err != nil {
-			panic(err)
-		}
-	}
-	return output
-}
-
-func (c Crawler) discv5(inputSet common.NodeSet) common.NodeSet {
-	ln, config := c.makeDiscoveryConfig()
-	log.Info("disc v5", "config", config, "addr", c.ListenAddr)
-
-	socket := listen(ln, c.ListenAddr)
-
-	disc, err := discover.ListenV5(socket, ln, config)
-	if err != nil {
-		panic(err)
-	}
-	defer disc.Close()
-
-	return c.runCrawler(disc, inputSet)
-}
-
-func (c Crawler) discv4(inputSet common.NodeSet) common.NodeSet {
-	ln, config := c.makeDiscoveryConfig()
-
-	log.Info("disc v4", "config", config, "addr", c.ListenAddr)
-
-	socket := listen(ln, c.ListenAddr)
-
-	disc, err := discover.ListenV4(socket, ln, config)
-	if err != nil {
-		panic(err)
-	}
-	defer disc.Close()
-
-	return c.runCrawler(disc, inputSet)
-}
-
-func (c Crawler) runCrawler(disc resolver, inputSet common.NodeSet) common.NodeSet {
-	log.Info("New crawler info", "crawler", c)
-	log.Info("Discovery config", "disc", disc)
-	crawler := NewCrawler(c.GenesisHash, c.NetworkID, c.NodeURL, inputSet, c.Workers, disc, disc.RandomNodes())
-	crawler.revalidateInterval = 1 * time.Minute
-	return crawler.Run(c.Timeout)
+func truncNow() time.Time {
+	return time.Now().UTC().Truncate(1 * time.Second)
 }
