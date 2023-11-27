@@ -13,7 +13,7 @@ import (
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
 	"github.com/unicornultrafoundation/go-u2u/libs/metrics"
 	"github.com/unicornultrafoundation/go-u2u/libs/metrics/exp"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 var Memsize memsizeui.Handler

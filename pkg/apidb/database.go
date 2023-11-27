@@ -2,12 +2,12 @@ package apidb
 
 import (
 	"database/sql"
+	"github.com/unicornultrafoundation/network-stats/pkg/crawlerdb"
+	"github.com/unicornultrafoundation/network-stats/pkg/vparser"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/ethereum/node-crawler/pkg/crawlerdb"
-	"github.com/ethereum/node-crawler/pkg/vparser"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
 )
 

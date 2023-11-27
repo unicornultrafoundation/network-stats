@@ -3,10 +3,10 @@ package crawler
 import (
 	"crypto/ecdsa"
 	"fmt"
+	"github.com/unicornultrafoundation/network-stats/pkg/common"
 	"net"
 	"time"
 
-	"github.com/ethereum/node-crawler/pkg/common"
 	ethCommon "github.com/unicornultrafoundation/go-u2u/libs/common"
 	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
 	"github.com/unicornultrafoundation/go-u2u/libs/log"
@@ -46,6 +46,7 @@ func getClientInfo(genesisHash ethCommon.Hash, networkID uint64, nodeURL string,
 
 	// If node provides no eth version, we can skip it.
 	if conn.negotiatedProtoVersion == 0 {
+		log.Info("conn.negotiatedProtoVersion == 0")
 		return &info, nil
 	}
 
@@ -61,7 +62,6 @@ func getClientInfo(genesisHash ethCommon.Hash, networkID uint64, nodeURL string,
 
 	// Regardless of whether we wrote a status message or not, the remote side
 	// might still send us one.
-
 	if err = readStatus(conn, &info); err != nil {
 		log.Error("read status", "error", err)
 		return nil, err
@@ -161,6 +161,7 @@ func getStatus(version uint32, genesis ethCommon.Hash, network uint64, nodeURL s
 }
 
 func readStatus(conn *Conn, info *common.ClientInfo) error {
+	log.Info("Read status", "c", conn)
 	switch msg := conn.Read().(type) {
 	case *Status:
 		info.NetworkID = msg.NetworkID

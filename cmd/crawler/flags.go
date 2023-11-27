@@ -3,7 +3,45 @@ package main
 import (
 	"time"
 
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
+)
+
+var (
+	//bootnodesFlag = &cli.StringFlag{
+	//	Name:  "bootnodes",
+	//	Usage: "Comma separated nodes used for bootstrapping",
+	//}
+	//nodekeyFlag = &cli.StringFlag{
+	//	Name:  "nodekey",
+	//	Usage: "Hex-encoded node key",
+	//}
+	//nodedbFlag = &cli.StringFlag{
+	//	Name:  "nodedb",
+	//	Usage: "Nodes database location",
+	//}
+	//listenAddrFlag = &cli.StringFlag{
+	//	Name:  "addr",
+	//	Usage: "Listening address",
+	//}
+	extAddrFlag = &cli.StringFlag{
+		Name:  "extaddr",
+		Usage: "UDP endpoint announced in ENR. You can provide a bare IP address or IP:port as the value of this flag.",
+	}
+	crawlTimeoutFlag = &cli.DurationFlag{
+		Name:  "timeout",
+		Usage: "Time limit for the crawl.",
+		Value: 30 * time.Minute,
+	}
+	crawlParallelismFlag = &cli.IntFlag{
+		Name:  "parallel",
+		Usage: "How many parallel discoveries to attempt.",
+		Value: 16,
+	}
+	remoteEnodeFlag = &cli.StringFlag{
+		Name:    "remote",
+		Usage:   "Enode of the remote node under test",
+		EnvVars: []string{"REMOTE_ENODE"},
+	}
 )
 
 var (
@@ -13,26 +51,26 @@ var (
 		// Required: true,
 	}
 	apiListenAddrFlag = &cli.StringFlag{
-		Name:  "addr",
+		Name:  "api-addr",
 		Usage: "Listening address",
-		Value: "0.0.0.0:10000",
+		Value: "0.0.0.0:0",
 	}
 	autovacuumFlag = &cli.StringFlag{
 		Name: "autovacuum",
-		Usage: ("Sets the autovacuum value for the databases. Possible values: " +
+		Usage: "Sets the autovacuum value for the databases. Possible values: " +
 			"NONE, FULL, or INCREMENTAL. " +
-			"https://www.sqlite.org/pragma.html#pragma_auto_vacuum"),
+			"https://www.sqlite.org/pragma.html#pragma_auto_vacuum",
 		Value: "INCREMENTAL",
 	}
 	bootnodesFlag = &cli.StringSliceFlag{
 		Name: "bootnodes",
-		Usage: ("Comma separated nodes used for bootstrapping. " +
-			"Defaults to hard-coded values for the selected network"),
+		Usage: "Comma separated nodes used for bootstrapping. " +
+			"Defaults to hard-coded values for the selected network",
 	}
 	busyTimeoutFlag = &cli.Uint64Flag{
 		Name: "busy-timeout",
-		Usage: ("Sets the busy_timeout value for the database in milliseconds. " +
-			"https://www.sqlite.org/pragma.html#pragma_busy_timeout"),
+		Usage: "Sets the busy_timeout value for the database in milliseconds. " +
+			"https://www.sqlite.org/pragma.html#pragma_busy_timeout",
 		Value: 3000,
 	}
 	crawlerDBFlag = &cli.StringFlag{
@@ -52,7 +90,7 @@ var (
 	listenAddrFlag = &cli.StringFlag{
 		Name:  "addr",
 		Usage: "Listening address",
-		Value: ":5051",
+		Value: "0.0.0.0:0",
 	}
 	nodedbFlag = &cli.StringFlag{
 		Name:  "nodedb",
@@ -87,3 +125,11 @@ var (
 		Value: "0x54e033c612a9b1a8ac8c6cb131f513202648f19b3a2756f8e2e40877d280606c",
 	}
 )
+
+var discoveryNodeFlags = []cli.Flag{
+	bootnodesFlag,
+	nodekeyFlag,
+	nodedbFlag,
+	listenAddrFlag,
+	extAddrFlag,
+}

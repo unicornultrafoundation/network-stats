@@ -5,11 +5,12 @@ import (
 	"net"
 
 	"github.com/unicornultrafoundation/go-u2u/libs/crypto"
+	"github.com/unicornultrafoundation/go-u2u/libs/log"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/discover"
 	"github.com/unicornultrafoundation/go-u2u/libs/p2p/enode"
 )
 
-func (c Crawler) makeDiscoveryConfig() (*enode.LocalNode, discover.Config) {
+func (c *Crawler) MakeDiscoveryConfig() (*enode.LocalNode, discover.Config) {
 	var cfg discover.Config
 	var err error
 
@@ -23,7 +24,7 @@ func (c Crawler) makeDiscoveryConfig() (*enode.LocalNode, discover.Config) {
 		cfg.PrivateKey, _ = crypto.GenerateKey()
 	}
 
-	cfg.Bootnodes, err = c.parseBootnodes()
+	cfg.Bootnodes, err = c.ParseBootnodes()
 	if err != nil {
 		panic(err)
 	}
@@ -44,13 +45,13 @@ func listen(ln *enode.LocalNode, addr string) *net.UDPConn {
 		ln.SetFallbackIP(uaddr.IP)
 	}
 	ln.SetFallbackUDP(uaddr.Port)
+	log.Info("local node listen ", "ip", ln.Node().IP(), "tcp", ln.Node().TCP())
 	return usocket
 }
 
-func (c Crawler) parseBootnodes() ([]*enode.Node, error) {
+func (c *Crawler) ParseBootnodes() ([]*enode.Node, error) {
 
-	//bootnodes := params.MainnetBootnodes
-	bootnodes := CrawlerMainnetBootnodes
+	bootnodes := U2UMainnetBootnodes
 	if len(c.Bootnodes) != 0 {
 		bootnodes = c.Bootnodes
 	}
