@@ -35,6 +35,7 @@ type U2U struct {
 
 // NewU2U Create a u2u instance
 func NewU2U(c *rpc.Client) *U2U {
+
 	return &U2U{
 		c:     c,
 		utils: &utils.Utils{},
@@ -114,8 +115,8 @@ func (e *U2U) GetBlockHeaderByNumber(number *big.Int, full bool) (*eTypes.Header
 	return head, nil
 }
 
-// GetBlocByNumber Get block header by block number
-func (e *U2U) GetBlocByNumber(number *big.Int, full bool) (*eTypes.Block, error) {
+// GetBlockByNumber Get block by block number
+func (e *U2U) GetBlockByNumber(number *big.Int, full bool) (*eTypes.Block, error) {
 	return e.getBlock("eth_getBlockByNumber", utils.ToBlockNumArg(number), full)
 }
 
